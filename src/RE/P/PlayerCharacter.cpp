@@ -19,12 +19,6 @@ namespace RE
 		return singleton->get();
 	}
 
-	bool PlayerCharacter::IsGodMode()
-	{
-		REL::Relocation<bool*> singleton{ RELOCATION_ID(517711, 404238) };
-		return *singleton;
-	}
-
 	void PlayerCharacter::ActivatePickRef()
 	{
 		using func_t = decltype(&PlayerCharacter::ActivatePickRef);
@@ -32,17 +26,10 @@ namespace RE
 		return func(this);
 	}
 
-	void PlayerCharacter::ActivatePickRefVR(VR_DEVICE a_device)
-	{
-		using func_t = decltype(&PlayerCharacter::ActivatePickRefVR);
-		REL::Relocation<func_t> func{ Offset::PlayerCharacter::ActivatePickRef };
-		return func(this, a_device);
-	}
-
 	void PlayerCharacter::AddPlayerAddItemEvent(TESObject* a_object, TESForm* a_owner, TESObjectREFR* a_container, AQUIRE_TYPE a_type)
 	{
 		using func_t = decltype(&PlayerCharacter::AddPlayerAddItemEvent);
-		REL::Relocation<func_t> func{ RELOCATION_ID(39384, 40456) };
+		REL::Relocation<func_t> func{ REL::ID(40456) };
 		return func(this, a_object, a_owner, a_container, a_type);
 	}
 
@@ -58,30 +45,9 @@ namespace RE
 		return CenterOnCell_Impl(a_cellName, nullptr);
 	}
 
-	bool PlayerCharacter::CenterOnCell(TESObjectCELL* a_cell)
+	bool PlayerCharacter::CenterOnCell(RE::TESObjectCELL* a_cell)
 	{
 		return CenterOnCell_Impl(nullptr, a_cell);
-	}
-
-	bool PlayerCharacter::CheckCast(MagicItem* a_spell, Effect* a_effect, MagicSystem::CannotCastReason& a_reason)
-	{
-		using func_t = decltype(&PlayerCharacter::CheckCast);
-		REL::Relocation<func_t> func{ RELOCATION_ID(39409, 40484) };
-		return func(this, a_spell, a_effect, a_reason);
-	}
-
-	void PlayerCharacter::DestroyMouseSprings()
-	{
-		using func_t = decltype(&PlayerCharacter::DestroyMouseSprings);
-		REL::Relocation<func_t> func{ RELOCATION_ID(39480, 40557) };
-		return func(this);
-	}
-
-	void PlayerCharacter::EndGrabObject()
-	{
-		if (GetPlayerRuntimeData().grabType == GrabbingType::kNormal) {
-			DestroyMouseSprings();
-		}
 	}
 
 	NiPointer<Actor> PlayerCharacter::GetActorDoingPlayerCommand() const
@@ -107,10 +73,10 @@ namespace RE
 		return func(this, a_form);
 	}
 
-	NiPointer<TESObjectREFR> PlayerCharacter::GetGrabbedRef(VR_DEVICE a_device)
+	NiPointer<TESObjectREFR> PlayerCharacter::GetGrabbedRef()
 	{
 		if SKYRIM_REL_CONSTEXPR (Module::IsVR()) {
-			return GetVRPlayerRuntimeData().grabbedObjectData[a_device].grabbedObject.get();
+			return nullptr;
 		} else {
 			return REL::RelocateMemberIfNewer<ObjectRefHandle>(SKSE::RUNTIME_SSE_1_6_629, this, 0x8C8, 0x8D0).get();
 		}
@@ -130,8 +96,6 @@ namespace RE
 		return func(this, a_tintType);
 	}
 
-	// TODO need to understand how this changed in VR
-#	ifndef ENABLE_SKYRIM_VR
 	TintMask* PlayerCharacter::GetOverlayTintMask(TintMask* a_original)
 	{
 		if SKYRIM_REL_VR_CONSTEXPR (REL::Module::IsVR()) {
@@ -173,13 +137,13 @@ namespace RE
 			return func(this, a_tintType, a_index);
 		}
 	}
-#	endif
 
 	bool PlayerCharacter::HasActorDoingCommand() const
 	{
 		if SKYRIM_REL_VR_CONSTEXPR (REL::Module::IsVR()) {
 			return static_cast<bool>(REL::RelocateMember<ActorHandle>(this, 0, 0xE8C));
-		} else {
+		}
+		else {
 			return static_cast<bool>(REL::RelocateMemberIfNewer<ActorHandle>(SKSE::RUNTIME_SSE_1_6_629, this, 0x894, 0x89C));
 		}
 	}
@@ -187,23 +151,11 @@ namespace RE
 	bool PlayerCharacter::IsGrabbing() const
 	{
 		if SKYRIM_REL_CONSTEXPR (Module::IsVR()) {
-			for (auto& VRgrabData : GetVRPlayerRuntimeData().grabbedObjectData) {
-				if (VRgrabData.grabbedObject) {
-					return true;
-				}
-			}
 			return false;
 		} else {
 			return static_cast<bool>(REL::RelocateMemberIfNewer<ObjectRefHandle>(SKSE::RUNTIME_SSE_1_6_629, this, 0x8C8, 0x8D0));
 		}
 	}
-
-#	ifdef ENABLE_SKYRIM_VR
-	bool PlayerCharacter::IsGrabbingWithDevice(VR_DEVICE a_device) const
-	{
-		return static_cast<bool>(GetVRPlayerRuntimeData().grabbedObjectData[a_device].grabbedObject);
-	}
-#	endif
 
 	void PlayerCharacter::PlayPickupEvent(TESForm* a_item, TESForm* a_containerOwner, TESObjectREFR* a_containerRef, EventType a_eventType)
 	{
@@ -226,11 +178,11 @@ namespace RE
 		return func(this, a_flag, a_escaped);
 	}
 
-	void PlayerCharacter::StartGrabObject(VR_DEVICE a_device)
+	void PlayerCharacter::StartGrabObject()
 	{
 		using func_t = decltype(&PlayerCharacter::StartGrabObject);
 		REL::Relocation<func_t> func{ Offset::PlayerCharacter::StartGrabObject };
-		return func(this, a_device);
+		return func(this);
 	}
 
 	void PlayerCharacter::UpdateCrosshairs()
